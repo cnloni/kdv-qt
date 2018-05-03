@@ -1,0 +1,5 @@
+/.ptp-sync/
+.ptp-sync-folder
+/bin/
+/Release/
+nohup.out
