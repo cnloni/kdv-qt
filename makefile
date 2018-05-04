@@ -1,3 +1,6 @@
+# All Target
+all: ./bin/kdv-qt
+
 # Add inputs and outputs from these tool invocations to the build variables
 CU_SRCS += \
 ./src/KdV.cu \
@@ -39,23 +42,20 @@ CPP_DEPS += \
 
 OS_SUFFIX := $(subst Linux,linux,$(subst Darwin/x86_64,darwin,$(shell uname -s)/$(shell uname -m)))
 
-# All Target
-all: kdv-qt bin/
-
 bin/:
 		@mkdir -p bin
 
 # Tool invocations
-kdv-qt: $(OBJS)
+./bin/kdv-qt: bin/ $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: NVCC Linker'
-	/usr/local/cuda/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30 -link -o  "kdv-qt" $(OBJS)
+	/usr/local/cuda/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30 -link -o "bin/kdv-qt" $(OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CU_DEPS)$(CPP_DEPS)$(C_DEPS) kdv-qt
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CU_DEPS)$(CPP_DEPS)$(C_DEPS) ./bin/kdv-qt
 	-@echo ' '
 
 .PHONY: all clean dependents
