@@ -2,4 +2,5 @@
 .ptp-sync-folder
 /bin/
 /Release/
+.settings
 nohup.out
