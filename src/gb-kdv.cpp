@@ -9,6 +9,8 @@
  */
 #include <iostream>
 #include <cmath>
+#include <getopt.h>
+#include <stdlib.h>
 #include "KdV.h"
 
 using namespace std;
@@ -18,74 +20,104 @@ double cospi(double x) {
 	return cos(M_PI * x);
 }
 
-timespec getTime() {
-	timespec time;
-	clock_gettime(CLOCK_MONOTONIC, &time);
-	return time;
-}
+class Calculator {
+private:
+	int N{256};
+	double dt{1e-5};
+	double T{10};
+	bool both{false};
+	Processor processor{Processor::CPU};
+	KdV2 kdv;
+	const char* opts{"N:d:T:CO:G"};
+public:
+	Calculator(){}
+	virtual ~Calculator(){}
 
-double getInterval(timespec& t1, timespec& t2) {
-	return (double)(t2.tv_nsec - t1.tv_nsec)*0.000001 + (double)(t2.tv_sec - t1.tv_sec)*1000.0;
-}
-
-void calc(cnl::Processor processor, cnl::KdV2& kdv) {
-	kdv.setProcessor(processor);
-	kdv.setInitialCondition(cospi);
-
-	timespec stime = getTime();
-	kdv.doStep();
-	timespec etime = getTime();
-
-	double elapsed = getInterval(stime,etime);
-	cout << "# processor = " << kdv.getProcessorName() << endl;
-	cout << "# elapsedTime = " << elapsed << " msec" << endl;
-	cout << "# u(0) = " << kdv.result.get(0) << endl;
-}
-
-int main(int argn, char** argv) {
-	int N;
-	double dt;
-	double T;
-	cnl::Processor processor{cnl::Processor::NOTSPECIFIED};
-
-	if (argn == 4) {
-		N  = stoi(argv[1]);
-		dt = stod(argv[2]);
-		T  = stod(argv[3]);
-	} else if (argn == 5) {
-		if (strcmp(argv[1],"--CPU") == 0) {
-			processor = cnl::Processor::CPU;
-		} else if (strcmp(argv[1],"--GPU") == 0) {
-				processor = cnl::Processor::GPU;
-		} else {
-			return -1;
+	bool parseArguments(int argn, char** argv) {
+		char opt;
+		while ((opt = getopt(argn, argv, opts)) != EOF) {
+			switch(opt)
+			{
+				case 'N':
+					N = atoi(optarg);
+					break;
+				case 'd':
+					dt = atof(optarg);
+					break;
+				case 'T':
+					T = atof(optarg);
+					break;
+				case 'C':
+					both = true;
+					break;
+				case 'G':
+					processor = Processor::GPU;
+					break;
+				default:
+					return false;
+			}
 		}
-		N  = stoi(argv[2]);
-		dt = stod(argv[3]);
-		T  = stod(argv[4]);
-	} else {
-		return -1;
+		return true;
 	}
 
-	cnl::KdV2 kdv{N, dt, T};
-	cout << "# ----------------" << endl;
-	cout << "# N  = " << N << endl;
-	cout << "# dt = " << dt << endl;
-	cout << "# T  = " << T << endl;
-	cout << "# steps = " << kdv.getSteps() << endl;
-
-	try {
-		if (processor == cnl::Processor::NOTSPECIFIED) {
-			calc(cnl::Processor::CPU, kdv);
-			calc(cnl::Processor::GPU, kdv);
-		} else if (processor == cnl::Processor::CPU) {
-			calc(cnl::Processor::CPU, kdv);
-		} else if (processor == cnl::Processor::GPU) {
-			calc(cnl::Processor::GPU, kdv);
+	bool calc() {
+		kdv.setup(N, dt, T);
+		try {
+			if (both) {
+				processor = Processor::CPU;
+				calcOnProcessor();
+				processor = Processor::GPU;
+				calcOnProcessor();
+			} else {
+				calcOnProcessor();
+			}
+			kdv.save("./results/kdv-qt.npy");
+			return true;
+		} catch(cnl::Exception& e) {
+			cerr << e.message << endl;
+			return false;
 		}
-		kdv.save("/tmp/kdv-qt.npy");
-	} catch(cnl::Exception& e) {
-		cerr << e.message << endl;
+	}
+
+private:
+	void calcOnProcessor() {
+		kdv.setProcessor(processor);
+		kdv.setInitialCondition(cospi);
+
+		timespec stime = getTime();
+		kdv.doStep();
+		timespec etime = getTime();
+
+		double elapsed = getInterval(stime,etime);
+		cout << "# ----------------" << endl;
+		cout << "# N  = " << N << endl;
+		cout << "# dt = " << dt << endl;
+		cout << "# T  = " << T << endl;
+		cout << "# steps = " << kdv.getSteps() << endl;
+		cout << "# processor = " << kdv.getProcessorName() << endl;
+		cout << "# elapsedTime = " << elapsed << " msec" << endl;
+		cout << "# u(0) = " << kdv.result.get(0) << endl;
+	}
+
+	timespec getTime() {
+		timespec time;
+		clock_gettime(CLOCK_MONOTONIC, &time);
+		return time;
+	}
+
+	double getInterval(timespec& t1, timespec& t2) {
+		return (double)(t2.tv_nsec - t1.tv_nsec)*0.000001 + (double)(t2.tv_sec - t1.tv_sec)*1000.0;
+	}
+};
+
+int main(int argn, char** argv) {
+	Calculator calculator;
+
+	if (calculator.parseArguments(argn, argv) == false) {
+		return -1;
+	}
+	if (calculator.calc() == false) {
+		return -1;;
 	}
 	return 0;
 }

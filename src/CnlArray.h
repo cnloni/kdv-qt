@@ -58,7 +58,7 @@ public:
 		path = base;
 		fp = fopen(path.c_str(), "wb");
 		if (fp == NULL) {
-			throw Exception(path + "not opened");
+			throw Exception(path + " not opened");
 		}
 	}
 	inline void writeString(const char* p, size_t n=0) {

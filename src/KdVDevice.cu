@@ -1,14 +1,8 @@
-/* *
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- */
 #include "KdV.h"
 
+/**
+ * GPUから呼ばれる(__device__)インライン(__inline__)関数
+ */
 __inline__ __device__ double derivative(unsigned tid, int N, cnl::KdVParam kdvp, double* a) {
 	double p1 = a[(tid + 1)%N];
 	double m1 = a[(tid - 1 + N)%N];
@@ -19,7 +13,7 @@ __inline__ __device__ double derivative(unsigned tid, int N, cnl::KdVParam kdvp,
 }
 
 /**
- * dt^2の精度
+ * CPUから呼ばれる(__global__)GPU上の関数
  */
 __global__ void kdv2_step(long nSteps, int N, cnl::KdVParam kdvp, double* um1) {
 	unsigned tid = threadIdx.x;
@@ -31,78 +25,30 @@ __global__ void kdv2_step(long nSteps, int N, cnl::KdVParam kdvp, double* um1) {
 	double s;
 	double sm1 = um1[tid];
 
-	{
-		//第1ステップ
-		a[tid] = sm1;
-		__syncthreads();
+	//第1ステップ
+	//共有メモリに代入する。それぞれのスレッドが自分の担当する位置に振幅の値を代入するので、
+	//結果的に共有メモリの全エリアに代入が行われる。
+	//そのため、__suncthreads()で代入が完了するのを待っている
+	a[tid] = sm1;
+	__syncthreads();
 
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
+	//2軒両隣までの共有メモリを参照して、方程式の右辺を計算する。
+	//後に共有メモリへの代入があるため、__suncthreads()ですべての参照が完了するのを待つ
+	f = derivative(tid, N, kdvp, a);
+	__syncthreads();
 
-		a[tid] = s = sm1 + f;
-		__syncthreads();
+	a[tid] = s = sm1 + f;
+	__syncthreads();
 
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
+	f = derivative(tid, N, kdvp, a);
+	__syncthreads();
 
-		nSteps--;
-	}
+	nSteps--;
 
 	for(int i=0; i<nSteps; i++) {
 		double sb = sm1;
 		sm1 = s;
 		a[tid] = s = sb + 2*f;
-		__syncthreads();
-
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
-	}
-	um1[tid] = s ;
-}
-
-__global__ void kdv3_step(long nSteps, int N, cnl::KdVParam kdvp, double* um1) {
-	unsigned tid = threadIdx.x;
-
-	double fm1, fm2, f;
-
-	// 共有メモリを割付
-	extern __shared__ double a[];
-	double s;
-	double sm1 = um1[tid];
-
-	{
-		//第1ステップ
-		a[tid] = sm1;
-		__syncthreads();
-
-		fm1 = derivative(tid, N, kdvp, a);
-		__syncthreads();
-
-		a[tid] = s = sm1 + fm1;
-		__syncthreads();
-
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
-
-		a[tid] = s += (f - fm1) / 2;
-		__syncthreads();
-
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
-	}
-
-	for(int i=1; i<nSteps; i++) {
-		double sb = sm1;
-		sm1 = s;
-		a[tid] = s += 2*f;
-		__syncthreads();
-
-		fm2 = fm1;
-		fm1 = f;
-		f = derivative(tid, N, kdvp, a);
-		__syncthreads();
-
-		a[tid] = s = sm1 + (-fm2 + 8*fm1 + 5*f) / 12;
 		__syncthreads();
 
 		f = derivative(tid, N, kdvp, a);

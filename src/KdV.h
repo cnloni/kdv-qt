@@ -47,18 +47,9 @@ protected:
 	long nSteps{0};
 	long counter{0};
 public:
+	KdV2(){}
 	KdV2(int N, double dt, double T){
-		this->N = N;
-		this->dt = dt;
-		this->T = T;
-		dx = 2/(double)N;
-		nSteps = round(T / dt);
-		kdvp.a = dt * TB / dx / 6;
-		kdvp.b = delta * delta * dt * TB / (dx * dx * dx) / 2;
-
-		result.setExtension(N);
-		u = new double[N];
-		um1 = new double[N];
+		setup(N, dt, T);
 	}
 	virtual ~KdV2(){
 		if (u != nullptr) {
@@ -73,6 +64,19 @@ public:
 			delete []f;
 			f = nullptr;
 		}
+	}
+	void setup(int N, double dt, double T) {
+		this->N = N;
+		this->dt = dt;
+		this->T = T;
+		dx = 2/(double)N;
+		nSteps = round(T / dt);
+		kdvp.a = dt * TB / dx / 6;
+		kdvp.b = delta * delta * dt * TB / (dx * dx * dx) / 2;
+
+		result.setExtension(N);
+		u = new double[N];
+		um1 = new double[N];
 	}
 	inline string getProcessorName() {
 		if (processor == Processor::GPU) {
@@ -123,44 +127,6 @@ public:
 	void calculateDerivatives(double *uu, double *ff);
 	virtual void doStepOnCPU();
 	virtual void doStepOnGPU();
-};
-
-class KdV3 : public KdV2 {
-private:
-	double *fm1{nullptr};
-	double *fm2{nullptr};
-public:
-	KdV3(int N, double dt, double T) : KdV2(N, dt, T) {
-	}
-	virtual ~KdV3(){
-		if (fm1 != nullptr) {
-			delete []fm1;
-			fm1 = nullptr;
-		}
-		if (fm2 != nullptr) {
-			delete []fm2;
-			fm2 = nullptr;
-		}
-	}
-	inline void doStep() {
-		cout << "# class = KdV3" << endl;
-		if (processor == Processor::GPU) {
-			doStepOnGPU();
-		} else {
-			if (f == nullptr) {
-				f = new double[N];
-			}
-			if (fm1 == nullptr) {
-				fm1 = new double[N];
-			}
-			if (fm2 == nullptr) {
-				fm2 = new double[N];
-			}
-			doStepOnCPU();
-		}
-	}
-	void doStepOnCPU();
-	void doStepOnGPU();
 };
 
 } /* namespace cnl */

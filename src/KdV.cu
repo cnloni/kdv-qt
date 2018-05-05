@@ -12,7 +12,6 @@
 #include "KdV.h"
 
 __global__ void kdv2_step(long nSteps, int N, cnl::KdVParam kdvp, double* u1);
-__global__ void kdv3_step(long nSteps, int N, cnl::KdVParam kdvp, double* u1);
 
 namespace cnl {
 
@@ -93,70 +92,29 @@ void KdV2::doStepOnCPU() {
  */
 void KdV2::doStepOnGPU() {
 	size_t unit = N * sizeof(double);
+
+	//GPU上のグローバルメモリを、double✕N個分確保する
 	double* gu;
 	checkCudaErrors(cudaMalloc((void**)&gu, unit));
 
+	//初期状態を入れた配列u[i]を、GPU上のメモリにコピーする
 	checkCudaErrors(cudaMemcpy(gu, u, unit, cudaMemcpyHostToDevice));
 
+	//GPUのグローバル関数
+	//グリッドサイズ=1
+	//ブロックサイズ=N
+	//共有メモリサイズ=double✕N
 	kdv2_step<<<1, N, unit>>>(nSteps, N, kdvp, gu);
+
+	//カーネルプログラムの実行終了を待つ（この場合は、後のcudaMemcpy()でブロッキングされるので、無くても良い）
 	cudaDeviceSynchronize();
 
-	counter += nSteps;
+	//計算結果（GPUのグローバルメモリ）をシステムメモリにコピーする
 	checkCudaErrors(cudaMemcpy(result.head(), gu, unit, cudaMemcpyDeviceToHost));
+
+	//GPUメモリを開放する
 	checkCudaErrors(cudaFree(gu));
-}
-
-void KdV3::doStepOnCPU() {
-	if (counter == 0) {
-		calculateDerivatives(u, fm1);
-		double* ub = um1;
-		um1 = u;
-		u = ub;
-		for(int i=0; i<N; i++) {
-			u[i] = um1[i] + fm1[i];
-		}
-		calculateDerivatives(u, f);
-		for(int i=0; i<N; i++) {
-			u[i] = um1[i] + (f[i] + fm1[i]) / 2;
-		}
-		calculateDerivatives(u, f);
-		counter = 1;
-	}
-	for(; counter<nSteps; counter++) {
-		double* ub = um1;
-		um1 = u;
-		u = ub;
-
-		double* fb = fm2;
-		fm2 = fm1;
-		fm1 = f;
-		f = fb;
-
-		for(int i=0; i<N; i++) {
-			u[i] += 2*fm1[i];
-		}
-		calculateDerivatives(u, f);
-		for(int i=0; i<N; i++) {
-			u[i] = um1[i] + (-fm2[i] + 8*fm1[i] + 5*f[i]) / 12;
-		}
-		calculateDerivatives(u, f);
-	}
-	result.setAll(u);
-}
-
-void KdV3::doStepOnGPU() {
-	size_t unit = N * sizeof(double);
-	double* pm1;
-	checkCudaErrors(cudaMalloc((void**)&pm1, unit));
-
-	checkCudaErrors(cudaMemcpy(pm1, u, unit, cudaMemcpyHostToDevice));
-
-	kdv3_step<<<1, N, unit>>>(nSteps, N, kdvp, pm1);
-	cudaDeviceSynchronize();
-
 	counter += nSteps;
-	checkCudaErrors(cudaMemcpy(result.head(), pm1, unit, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(pm1));
 }
 
 } /* namespace cnl */

@@ -21,7 +21,7 @@
 					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.debug.1725703310." name="/" resourcePath="">
 						<toolChain id="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug.1213488932" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug">
 							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.391605910" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/kdv-qt}/Debug" id="com.nvidia.cuda.ide.builder.837546428" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 8.0 Builder" superClass="com.nvidia.cuda.ide.builder"/>
+							<builder buildPath="${workspace_loc:/kdv-qt}/Debug" id="com.nvidia.cuda.ide.builder.837546428" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 9.1 Builder" superClass="com.nvidia.cuda.ide.builder"/>
 							<tool id="nvcc.compiler.base.866051211" name="NVCC Compiler" superClass="nvcc.compiler.base">
 								<option id="nvcc.compiler.deviceDebug.1179996089" name="Generate device debug information (-G)" superClass="nvcc.compiler.deviceDebug" value="true" valueType="boolean"/>
 								<option id="nvcc.compiler.option.level.843495199" name="Generate host debug information (-g)" superClass="nvcc.compiler.option.level" value="true" valueType="boolean"/>
@@ -74,16 +74,15 @@
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" errorParsers="nvcc.errorParser;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.nvidia.cuda.ide.eight_zero.configuration.release.1583328924" name="Release" parent="com.nvidia.cuda.ide.eight_zero.configuration.release">
 					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.release.1583328924." name="/" resourcePath="">
-						<toolChain id="com.nvidia.cuda.ide.toolchain.nine_zero.1600410787" name="CUDA Toolkit 9.1" superClass="com.nvidia.cuda.ide.toolchain.nine_zero">
+						<toolChain errorParsers="" id="com.nvidia.cuda.ide.toolchain.nine_zero.1600410787" name="CUDA Toolkit 9.1" superClass="com.nvidia.cuda.ide.toolchain.nine_zero">
 							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.1436088076" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/kdv-qt}/Release" id="com.nvidia.cuda.ide.builder.412013023" keepEnvironmentInBuildfile="false" name="CUDA Toolkit 9.1 Builder" superClass="com.nvidia.cuda.ide.builder"/>
-							<tool id="nvcc.compiler.base.1061889812" name="NVCC Compiler" superClass="nvcc.compiler.base">
+							<builder buildPath="${workspace_loc:/kdv-qt}/Release" errorParsers="org.eclipse.cdt.core.GmakeErrorParser" id="com.nvidia.cuda.ide.builder.412013023" keepEnvironmentInBuildfile="false" name="CUDA Toolkit 9.1 Builder" superClass="com.nvidia.cuda.ide.builder"/>
+							<tool errorParsers="nvcc.errorParser;org.eclipse.cdt.core.GCCErrorParser" id="nvcc.compiler.base.1061889812" name="NVCC Compiler" superClass="nvcc.compiler.base">
 								<option id="nvcc.compiler.include.paths.949495874" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/kdv-qt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/cuda/samples/common/inc"/>
@@ -96,14 +95,14 @@
 								<inputType id="nvcc.compiler.input.cpp.1153114354" superClass="nvcc.compiler.input.cpp"/>
 								<inputType id="nvcc.compiler.input.c.832328462" superClass="nvcc.compiler.input.c"/>
 							</tool>
-							<tool id="nvcc.linker.base.813030060" name="NVCC Linker" superClass="nvcc.linker.base">
+							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser;nvcc.errorParser" id="nvcc.linker.base.813030060" name="NVCC Linker" superClass="nvcc.linker.base">
 								<inputType id="nvcc.linker.input.1940344042" superClass="nvcc.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
 							</tool>
 							<tool id="nvcc.archiver.base.1266430497" name="NVCC Archiver" superClass="nvcc.archiver.base"/>
-							<tool id="com.nvidia.host.assembler.1207038418" name="Host Assembler" superClass="com.nvidia.host.assembler">
+							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="com.nvidia.host.assembler.1207038418" name="Host Assembler" superClass="com.nvidia.host.assembler">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.892959244" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
