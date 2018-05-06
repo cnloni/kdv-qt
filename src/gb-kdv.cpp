@@ -1,12 +1,19 @@
-/* *
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
+/**
+   Copyright 2018 HIGASHIMURA Takenori
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
  */
+
 #include <iostream>
 #include <cmath>
 #include <getopt.h>
@@ -28,14 +35,15 @@ private:
 	bool both{false};
 	Processor processor{Processor::CPU};
 	KdV2 kdv;
-	const char* opts{"N:d:T:CO:G"};
+	string opts{"N:d:T:O:CG"};
+	string dataFilename;
 public:
 	Calculator(){}
 	virtual ~Calculator(){}
 
 	bool parseArguments(int argn, char** argv) {
 		char opt;
-		while ((opt = getopt(argn, argv, opts)) != EOF) {
+		while ((opt = getopt(argn, argv, opts.c_str())) != EOF) {
 			switch(opt)
 			{
 				case 'N':
@@ -48,7 +56,7 @@ public:
 					T = atof(optarg);
 					break;
 				case 'C':
-					both = true;
+					processor = Processor::CPU;
 					break;
 				case 'G':
 					processor = Processor::GPU;
@@ -57,6 +65,9 @@ public:
 					return false;
 			}
 		}
+		ostringstream stream;
+		stream << N << '_' << dt << '_' << T;
+		dataFilename = "kdv_" + stream.str() + ".npy";
 		return true;
 	}
 
@@ -71,7 +82,7 @@ public:
 			} else {
 				calcOnProcessor();
 			}
-			kdv.save("./results/kdv-qt.npy");
+			kdv.save("./results/" + dataFilename);
 			return true;
 		} catch(cnl::Exception& e) {
 			cerr << e.message << endl;

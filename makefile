@@ -40,10 +40,8 @@ CPP_DEPS += \
 	@echo ' '
 
 
-OS_SUFFIX := $(subst Linux,linux,$(subst Darwin/x86_64,darwin,$(shell uname -s)/$(shell uname -m)))
-
 bin/:
-		@mkdir -p bin
+	-mkdir -p bin
 
 # Tool invocations
 ./bin/kdv-qt: bin/ $(OBJS)
