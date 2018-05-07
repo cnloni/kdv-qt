@@ -52,6 +52,10 @@ bin/:
 	@echo ' '
 
 # Other Targets
+test: ./bin/kdv-qt
+	$< -N 256 -d 1e-5 -T 1
+	$< -N 256 -d 1e-5 -T 3.6
+
 clean:
 	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CU_DEPS)$(CPP_DEPS)$(C_DEPS) ./bin/kdv-qt
 	-@echo ' '

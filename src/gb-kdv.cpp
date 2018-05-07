@@ -32,11 +32,11 @@ private:
 	int N{256};
 	double dt{1e-5};
 	double T{10};
-	bool both{false};
 	Processor processor{Processor::CPU};
 	KdV2 kdv;
-	string opts{"N:d:T:O:CG"};
-	string dataFilename;
+	string opts{"N:d:T:CG"};
+	string dataPath;
+	string dataDir{"./results"};
 public:
 	Calculator(){}
 	virtual ~Calculator(){}
@@ -65,24 +65,33 @@ public:
 					return false;
 			}
 		}
+		kdv.setup(N, dt, T);
+		kdv.setProcessor(processor);
 		ostringstream stream;
-		stream << N << '_' << dt << '_' << T;
-		dataFilename = "kdv_" + stream.str() + ".npy";
+		stream << N << '_' << dt << '_' << T << '_' << kdv.getProcessorName();
+		dataPath = dataDir + string("/kdv_") + stream.str() + string(".npy");
 		return true;
 	}
 
 	bool calc() {
-		kdv.setup(N, dt, T);
 		try {
-			if (both) {
-				processor = Processor::CPU;
-				calcOnProcessor();
-				processor = Processor::GPU;
-				calcOnProcessor();
-			} else {
-				calcOnProcessor();
-			}
-			kdv.save("./results/" + dataFilename);
+			kdv.setInitialCondition(cospi);
+
+			timespec stime = getTime();
+			kdv.doStep();
+			timespec etime = getTime();
+
+			double elapsed = getInterval(stime,etime);
+			cout << "# ----------------" << endl;
+			cout << "# N  = " << N << endl;
+			cout << "# dt = " << dt << endl;
+			cout << "# T  = " << T << endl;
+			cout << "# steps = " << kdv.getSteps() << endl;
+			cout << "# processor = " << kdv.getProcessorName() << endl;
+			cout << "# elapsedTime = " << elapsed << " msec" << endl;
+			cout << "# u(0) = " << kdv.result.get(0) << endl;
+
+			kdv.save(dataPath);
 			return true;
 		} catch(cnl::Exception& e) {
 			cerr << e.message << endl;
@@ -91,25 +100,6 @@ public:
 	}
 
 private:
-	void calcOnProcessor() {
-		kdv.setProcessor(processor);
-		kdv.setInitialCondition(cospi);
-
-		timespec stime = getTime();
-		kdv.doStep();
-		timespec etime = getTime();
-
-		double elapsed = getInterval(stime,etime);
-		cout << "# ----------------" << endl;
-		cout << "# N  = " << N << endl;
-		cout << "# dt = " << dt << endl;
-		cout << "# T  = " << T << endl;
-		cout << "# steps = " << kdv.getSteps() << endl;
-		cout << "# processor = " << kdv.getProcessorName() << endl;
-		cout << "# elapsedTime = " << elapsed << " msec" << endl;
-		cout << "# u(0) = " << kdv.result.get(0) << endl;
-	}
-
 	timespec getTime() {
 		timespec time;
 		clock_gettime(CLOCK_MONOTONIC, &time);

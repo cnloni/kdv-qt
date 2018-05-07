@@ -166,41 +166,6 @@ public:
 	}
 };
 
-class CnlArray2D : public CnlArray {
-protected:
-	size_t	size_y{0};
-public:
-	CnlArray2D(){}
-	CnlArray2D(size_t sx, size_t sy) {
-		setExtension(sx, sy);
-	}
-	virtual ~CnlArray2D() {
-		clearMemory();
-	}
-	inline void setExtension(size_t sx, size_t sy) {
-		size_x = sx;
-		size_y = sy;
-		length = size_x * size_y;
-		clearMemory();
-		ptr = new double[length];
-	}
-	inline int ylength() {
-		return size_y;
-	}
-	inline double get(size_t x, size_t y) {
-		return ((CnlArray*)this)->get(x*size_y + y);
-	}
-	inline void set(size_t x, size_t y, double v) {
-		((CnlArray*)this)->set(x*size_y + y, v);
-	}
-	inline double* getRow(size_t x) {
-		return (x < size_x)?ptr+x*size_y:nullptr;
-	}
-	inline void setRow(size_t x, double* p){
-		memcpy(ptr+x*size_y, p, sizeof(double)*size_y);
-	}
-};
-
 class NumpyArray : public NumpyObject, public CnlArray {
 public:
 	NumpyArray(){}
@@ -211,24 +176,6 @@ public:
 	inline string getShape() {
 		char sbuf[32];
 		sprintf(sbuf, "(%d, )", this->size_x);
-		return string(sbuf);
-	}
-	inline void save() {
-		writeHeader();
-		writeDouble(head(), getLength());
-	}
-};
-
-class NumpyArray2D : public NumpyObject, public CnlArray2D {
-public:
-	NumpyArray2D(){}
-	NumpyArray2D(size_t sx, size_t sy) : CnlArray2D(sx, sy) {
-	}
-	virtual ~NumpyArray2D() {
-	}
-	inline string getShape() {
-		char sbuf[32];
-		sprintf(sbuf, "(%d, %d)", this->size_x, this->size_y);
 		return string(sbuf);
 	}
 	inline void save() {

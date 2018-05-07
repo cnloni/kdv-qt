@@ -11,7 +11,10 @@ def get_prop(filename):
     r = [int(p[1]), float(p[2]), float(p[3])]
     return r
 
-npyfile = 'kdv_256_1e-05_10.npy'
+npyfiles = [
+    'kdv_256_1e-05_1_CPU.npy',
+    'kdv_256_1e-05_3.6_CPU.npy',
+]
 N, dt, T = get_prop(npyfile)
 
 root = 'fig1'
