@@ -16,6 +16,7 @@ def get_prop(path):
     return r
 
 npyfiles = [
+    'kdv_256_1e-05_0.npy',
     'kdv_256_1e-05_1.npy',
     'kdv_256_1e-05_3.6.npy',
 ]
