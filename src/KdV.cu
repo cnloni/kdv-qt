@@ -100,6 +100,11 @@ void KdV2::doStepOnCPU() {
  * result: 結果を格納するクラス
  */
 void KdV2::doStepOnGPU() {
+	if (nSteps > 0) {
+		result.setAll(u);
+		return;
+	}
+
 	size_t unit = N * sizeof(double);
 
 	//GPU上のグローバルメモリを、double✕N個分確保する

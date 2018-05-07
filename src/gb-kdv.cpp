@@ -68,7 +68,7 @@ public:
 		kdv.setup(N, dt, T);
 		kdv.setProcessor(processor);
 		ostringstream stream;
-		stream << N << '_' << dt << '_' << T << '_' << kdv.getProcessorName();
+		stream << N << '_' << dt << '_' << T;	//<< '_' << kdv.getProcessorName();
 		dataPath = dataDir + string("/kdv_") + stream.str() + string(".npy");
 		return true;
 	}

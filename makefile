@@ -21,6 +21,7 @@ CU_DEPS += \
 CPP_DEPS += \
 ./bin/gb-kdv.d
 
+PROCESSOR = $(shell which nvidia-smi && echo G || echo C)
 
 # Each subdirectory must supply rules for building sources it contributes
 ./bin/%.o: ./src/%.cu
@@ -53,8 +54,9 @@ bin/:
 
 # Other Targets
 test: ./bin/kdv-qt
-	$< -N 256 -d 1e-5 -T 1
-	$< -N 256 -d 1e-5 -T 3.6
+	$< -N 256 -d 1e-5 -T 0 -$(PROCESSOR)
+	$< -N 256 -d 1e-5 -T 1 -$(PROCESSOR)
+	$< -N 256 -d 1e-5 -T 3.6 -$(PROCESSOR)
 
 clean:
 	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CU_DEPS)$(CPP_DEPS)$(C_DEPS) ./bin/kdv-qt
