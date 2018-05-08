@@ -1,6 +1,6 @@
 # kdv-qt
 
-![kdv-qt](https://raw.github.com/wiki/cnloni/kdv-qt/images/fig1.png)
+![kdv-qt](https://github.com/cnloni/kdv-qt/raw/master/results/fig1.png)
 
 ## Prerequisites
 * This software is validated on CUDA 9.1 and Debian 9.4
