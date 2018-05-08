@@ -3,7 +3,7 @@
 /bin/
 /Release/
 /Debug/
-.settings
+/.settings/
 nohup.out
 *.dat
 *.npy
