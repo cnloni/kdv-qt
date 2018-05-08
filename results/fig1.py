@@ -12,14 +12,10 @@ def get_rootname(path):
 def get_prop(path):
     root = get_rootname(path)
     p = root.split("_")
-    r = [int(p[1]), float(p[2]), float(p[3])]
-    return r
+    return p[1:]
 
-npyfiles = [
-    'kdv_256_1e-05_0.npy',
-    'kdv_256_1e-05_1.npy',
-    'kdv_256_1e-05_3.6.npy',
-]
+
+npyfiles = sys.argv[1:]
 N, dt, T = get_prop(npyfiles[0])
 
 rootname = get_rootname(sys.argv[0])
@@ -28,13 +24,15 @@ pngfile = rootname + '.png'
 fig = plt.figure(figsize=[4.8, 3.6])
 ax = fig.add_subplot(111)
 ax.set_title(rootname)
-ax.axis([0, N - 1, -1.1, 2.9])
-x = range(N)
+ax.axis([0, int(N) - 1, -1.1, 2.9])
+x = range(int(N))
+labels = []
 
 for npyfile in npyfiles:
     d = np.load(npyfile)
+    N, dt, T = get_prop(npyfile)
+    labels.append('T='+T)
     ax.plot(x, d)
 
+ax.legend(labels)
 plt.show()
-
-#plt.savefig(pngfile);
