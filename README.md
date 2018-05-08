@@ -1,6 +1,6 @@
 # kdv-qt
 
-![kdv-qt](file:./results/fig1.png)
+![kdv-qt](https://github.com/cakecatz/garage/blob/images/garage-screenshot-01.png)
 
 ## Prerequisites
 * This software is validated on CUDA 9.1 and Debian 9.4
