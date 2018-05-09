@@ -100,7 +100,7 @@ void KdV2::doStepOnCPU() {
  * result: 結果を格納するクラス
  */
 void KdV2::doStepOnGPU() {
-	if (nSteps > 0) {
+	if (nSteps == 0) {
 		result.setAll(u);
 		return;
 	}
