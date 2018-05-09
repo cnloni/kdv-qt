@@ -7,7 +7,7 @@ CPP_BASE = gb-kdv
 DEPS = $(CU_BASE:%=./bin/%.d) $(CPP_BASE:%=./bin/%.d)
 OBJS = $(CU_BASE:%=./bin/%.o) $(CPP_BASE:%=./bin/%.o)
 
-PROCESSOR = $(shell which nvidia-smi && echo G || echo C)
+PROCESSOR = $(shell (which nvidia-smi >/dev/null) && echo G || echo C)
 
 
 ./bin/%.o: ./src/%.cu
