@@ -39,8 +39,10 @@ PROCESSOR = $(shell (which nvidia-smi >/dev/null) && echo G || echo C)
 TIMES = 0 1 3.6
 NPYS = $(TIMES:%=./results/kdv_256_1e-05_%.npy)
 
-fig1: $(NPYS)
-	./results/fig1.py $^
+fig1data: $(NPYS)
+
+fig1: fig1data
+	./results/fig1.py $(NPYS)
 
 ./results/kdv_256_1e-05_0.npy: ./bin/kdv-qt
 	$< -N 256 -d 1e-5 -T 0 -$(PROCESSOR)
