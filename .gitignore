@@ -3,8 +3,13 @@
 /bin/
 /Release/
 /Debug/
+<<<<<<< HEAD
 /.settings/
 nohup.out
 *.dat
 *.npy
 
+=======
+.settings
+nohup.out
+>>>>>>> refs/remotes/eclipse_auto/master

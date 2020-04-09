@@ -1,3 +1,6 @@
 *.dat
+<<<<<<< HEAD
 *.npy
+=======
+>>>>>>> refs/remotes/eclipse_auto/master
 

@@ -1,4 +1,5 @@
 # kdv-qt
+<<<<<<< HEAD
 Solve the KdV equation with CUDA
 
 ![kdv-qt](https://github.com/cnloni/kdv-qt/raw/master/results/fig1.png)
@@ -65,3 +66,10 @@ see ./LICENCE
 Copyright (c) 2018 HIGASHIMURA Takenori <oni@cynetlab.com>
 
 [(1)]: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.15.240
+=======
+
+## Copyright
+see ./LICENCE
+
+Copyright (c) 2018 HIGASHIMURA Takenori <oni@cynetlab.com>
+>>>>>>> refs/remotes/eclipse_auto/master
